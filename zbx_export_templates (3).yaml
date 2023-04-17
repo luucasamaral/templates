@@ -1,0 +1,740 @@
+zabbix_export:
+  version: '6.0'
+  date: '2023-04-17T12:25:23Z'
+  groups:
+    -
+      uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+  templates:
+    -
+      uuid: 3225bcd9e7184f4882a6e7ff83ea171e
+      template: '1 - Template SNMP Ubiquiti AirMax Novo'
+      name: '1 - Template SNMP Ubiquiti AirMax Novo'
+      groups:
+        -
+          name: Templates
+      items:
+        -
+          uuid: 55b2577b9e7943e8b0346172c1ec2b48
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          delay: '60'
+          history: 7d
+          trends: 90d
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: ICMP
+          triggers:
+            -
+              uuid: e9f04d83c58e4ed8a145ebcd73c80e41
+              expression: 'max(/1 - Template SNMP Ubiquiti AirMax Novo/icmpping,#5)=0'
+              name: 'Indisponibilidade de 5 minutos na resposta ICMP para: {HOST.NAME} no endereço de IP: {HOST.CONN}'
+              priority: HIGH
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Indisponibilidade de 10 minutos na resposta ICMP para: {HOST.NAME} no endereço de IP: {HOST.CONN}'
+                  expression: 'max(/1 - Template SNMP Ubiquiti AirMax Novo/icmpping,#10)=0'
+            -
+              uuid: 212a25359a1847248639bbf2f9e6176f
+              expression: 'max(/1 - Template SNMP Ubiquiti AirMax Novo/icmpping,#10)=0'
+              name: 'Indisponibilidade de 10 minutos na resposta ICMP para: {HOST.NAME} no endereço de IP: {HOST.CONN}'
+              priority: DISASTER
+              manual_close: 'YES'
+        -
+          uuid: db1e4afae86f48e2bbe91d4392f6b9c4
+          name: 'Perda de Pacotes ICMP'
+          type: SIMPLE
+          key: icmppingloss
+          delay: '60'
+          history: 7d
+          trends: 90d
+          value_type: FLOAT
+          units: '%'
+          tags:
+            -
+              tag: Application
+              value: ICMP
+          triggers:
+            -
+              uuid: 80b427c6e39e4adab8e1f198a03a97bd
+              expression: 'min(/1 - Template SNMP Ubiquiti AirMax Novo/icmppingloss,5m)>20'
+              name: 'Nos últimos 5 minutos ocorreu 20% de perda na reposta ICMP para: {HOST.NAME} no endereço de IP: {HOST.CONN}'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Indisponibilidade de 5 minutos na resposta ICMP para: {HOST.NAME} no endereço de IP: {HOST.CONN}'
+                  expression: 'max(/1 - Template SNMP Ubiquiti AirMax Novo/icmpping,#5)=0'
+        -
+          uuid: 2c4b3a8ff9414910b0259d8814506c0b
+          name: 'Tempo de Resposta ICMP'
+          type: SIMPLE
+          key: icmppingsec
+          delay: '60'
+          history: 7d
+          trends: 90d
+          value_type: FLOAT
+          units: s
+          tags:
+            -
+              tag: Application
+              value: ICMP
+          triggers:
+            -
+              uuid: a1d03f1599724c7c898eaf3a0d424a4a
+              expression: 'avg(/1 - Template SNMP Ubiquiti AirMax Novo/icmppingsec,5m)>0.15'
+              name: 'Nos últimos 5 minutos o tempo de resposta ICMP esteve acima de 150ms para: {HOST.NAME} no endereço de IP: {HOST.CONN} está acima da média.'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Indisponibilidade de 5 minutos na resposta ICMP para: {HOST.NAME} no endereço de IP: {HOST.CONN}'
+                  expression: 'max(/1 - Template SNMP Ubiquiti AirMax Novo/icmpping,#5)=0'
+        -
+          uuid: f96886468306414c99fcc3d652cbdf3a
+          name: 'Número de Interfaces de Rede'
+          type: SNMP_AGENT
+          snmp_oid: 'IF-MIB::ifNumber.0'
+          key: ifNumber
+          delay: '3600'
+          history: 7d
+          trends: 90d
+          description: 'O número de interfaces de rede (independentemente do estado atual) presentes neste sistema.'
+          tags:
+            -
+              tag: Application
+              value: Interfaces
+        -
+          uuid: 9f945411c9a0469eb5d9cdc4fb536d12
+          name: 'Detalhes do Contato do Dispositivo'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-MIB::sysContact.0'
+          key: sysContact
+          delay: '3600'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'A identificação textual da pessoa de contato para este nó gerenciado, juntamente com informações sobre como entrar em contato com essa pessoa. Se nenhuma informação de contato for conhecida, o valor é a seqüência de comprimento zero.'
+          inventory_link: CONTACT
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 628d4e022bcb440e9439e89830540b9c
+          name: 'Descrição do Dispositivo'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-MIB::sysDescr.0'
+          key: sysDescr
+          delay: '3600'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Uma descrição textual da entidade. Esse valor deve incluir o nome completo e a identificação da versão do tipo de hardware do sistema, do sistema operacional do software e do software de rede.'
+          inventory_link: HARDWARE
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 3f0768eca4b149b19cb75fd514fbdfa0
+          name: 'Localização do Dispositivo'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-MIB::sysLocation.0'
+          key: sysLocation
+          delay: '3600'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'A localização física deste nó (por exemplo, ''armário de telefone, 3º andar''). Se o local é desconhecido, o valor é a seqüência de comprimento zero.'
+          inventory_link: LOCATION
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 45bb6831184f4d28b537bd0e780af406
+          name: 'Nome do Dispositivo'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-MIB::sysName.0'
+          key: sysName
+          delay: '60'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Um nome atribuído administrativamente para este nó gerenciado. Por convenção, este é o nome de domínio totalmente qualificado do nó. Se o nome é desconhecido, o valor é a seqüência de comprimento zero.'
+          inventory_link: NAME
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: 0d26ac64b99949619accf453fe773447
+              expression: 'nodata(/1 - Template SNMP Ubiquiti AirMax Novo/sysName,5m)=1'
+              name: 'Indisponibilidade de 5 minutos na resposta ICMP para: {HOST.NAME} no endereço de IP: {HOST.CONN}'
+              status: DISABLED
+              priority: HIGH
+        -
+          uuid: 3547d29e40db4785af0cc16dc0ba2a9e
+          name: 'Device uptime'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-MIB::sysUpTime.0'
+          key: sysUpTime
+          delay: '60'
+          history: 7d
+          trends: 90d
+          units: uptime
+          description: 'The time since the network management portion of the system was last re-initialized.'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: fae69234a7c344b59b7a6121e48542f1
+          name: 'Capacidade do AirMax'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.6.1.4.1'
+          key: ubntAirMaxCapacity
+          delay: '60'
+          history: 7d
+          trends: 90d
+          status: DISABLED
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: 83469c1a8b074e9db17e3b1e8b0dea5f
+          name: 'AirMax Ativado'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.6.1.2.1'
+          key: ubntAirMaxEnabled
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: 573abd7da64a462196d71cb5a2d59571
+          name: 'Qualidade do AirMax'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.6.1.3.1'
+          key: ubntAirMaxQuality
+          delay: '60'
+          history: 7d
+          trends: 90d
+          status: DISABLED
+          tags:
+            -
+              tag: Application
+              value: Wireless
+          triggers:
+            -
+              uuid: 292165c8de3f49bbbd6f38ccc9182017
+              expression: 'last(/1 - Template SNMP Ubiquiti AirMax Novo/ubntAirMaxQuality)<50'
+              name: 'Baixa Qualidade do AirMax ({ITEM.LASTVALUE}) em {HOST.NAME} no IP: {HOST.CONN}'
+              status: DISABLED
+              priority: HIGH
+            -
+              uuid: 32673a2e9ef74fa1a86c8d5956e33289
+              expression: 'last(/1 - Template SNMP Ubiquiti AirMax Novo/ubntAirMaxQuality)<70'
+              name: 'Baixa Qualidade do AirMax ({ITEM.LASTVALUE}) em {HOST.NAME} no IP: {HOST.CONN}'
+              status: DISABLED
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Baixa Qualidade do AirMax ({ITEM.LASTVALUE}) em {HOST.NAME} no IP: {HOST.CONN}'
+                  expression: 'last(/1 - Template SNMP Ubiquiti AirMax Novo/ubntAirMaxQuality)<50'
+        -
+          uuid: 655164846fad4300920355f9149169a4
+          name: 'Versão do chipset do dispositivo'
+          type: SNMP_AGENT
+          snmp_oid: 'IEEE802dot11-MIB::dot11manufacturerProductVersion.5'
+          key: ubntChipsetVersion
+          delay: '60'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 1a43e32132b14f66a472dfa8d5d2f0f2
+          name: 'Nome do Produto do Dispositivo'
+          type: SNMP_AGENT
+          snmp_oid: 'IEEE802dot11-MIB::dot11manufacturerProductName.5'
+          key: ubntProductName
+          delay: '60'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 8bf1eaec65924c8e9fd8c51108a23ea2
+          name: 'Máscara da Cadeia da Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.1.1.8.1'
+          key: ubntRadioChainmask
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: ee546b427feb4455a6299459a3afdc1f
+          name: 'Frequência do Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.1.1.4.1'
+          key: ubntRadioFreq
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: 8f1b3fb035f94cc086a9d66d84e5a99f
+          name: 'Modo de Operação do Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.1.1.2.1'
+          key: ubntRadioMode
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: f98d11722c1049f0b639b013d4fb4d58
+          name: 'Radio TX Power'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.1.1.6.1'
+          key: ubntRadioTxPower
+          delay: '60'
+          history: 7d
+          trends: 90d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: c30bb0c4b4be43ed9433175cd20016b0
+          name: 'Nivel CCQ do Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.5.1.7.1'
+          key: ubntWlStatCcq
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: d4b7ca248d2e47849b3ff0246d157ecb
+          name: 'Largura do canal do Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.5.1.14.1'
+          key: ubntWlStatChanWidth
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: 4d6abd4537634a07993f9ba888108d6e
+          name: 'Ruído do Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.5.1.8.1'
+          key: ubntWlStatNoiseFloor
+          delay: '60'
+          history: 7d
+          trends: 90d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: 5136527a09d04220b716bf548bbbbe76
+          name: 'Indicação da intensidade do sinal recebido no Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.5.1.6.1'
+          key: ubntWlStatRssi
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: 04fa536c300041829eb29cafb4b34058
+          name: 'Taxa de RX do Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.5.1.10.1'
+          key: ubntWlStatRxRate
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: e4fed5da9ddd441e84be5a5f3442026f
+          name: 'Sinal do Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.5.1.5.1'
+          key: ubntWlStatSignal
+          delay: '60'
+          history: 7d
+          trends: 90d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Wireless
+        -
+          uuid: fa649bc2e94a416e9ef7bebe2dab559b
+          name: 'Número de estações conectadas no rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.5.1.15.1'
+          key: ubntWlStatStaCount
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+          triggers:
+            -
+              uuid: aed4e5341ff94def8960d2991e3c40f2
+              expression: 'min(/1 - Template SNMP Ubiquiti AirMax Novo/ubntWlStatStaCount,3s)=0'
+              name: '{HOST.NAME} no IP: {HOST.CONN} - Não possui clientes conectados a mais de 3 minutos. Possível travamento da placa Wireless'
+              status: DISABLED
+              priority: HIGH
+            -
+              uuid: d4595ff1ffd0437098484d72e365818e
+              expression: 'min(/1 - Template SNMP Ubiquiti AirMax Novo/ubntWlStatStaCount,10s)=0'
+              name: '{HOST.NAME} no IP: {HOST.CONN} - Não possui clientes conectados a mais de 10 minutos. Possível travamento da placa Wireless'
+              status: DISABLED
+              priority: DISASTER
+        -
+          uuid: cd1d7e23b67a45669d5d2cc63a8d1c91
+          name: 'Taxa de TX do Rádio'
+          type: SNMP_AGENT
+          snmp_oid: 'SNMPv2-SMI::enterprises.41112.1.4.5.1.9.1'
+          key: ubntWlStatTxRate
+          delay: '60'
+          history: 7d
+          trends: 90d
+          tags:
+            -
+              tag: Application
+              value: Wireless
+      discovery_rules:
+        -
+          uuid: 381188eab2254927bfcbe9bcaeb8a089
+          name: 'Interfaces de rede'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},IF-MIB::ifDescr]'
+          key: ifDescr
+          delay: '60'
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: '@Network interfaces for discovery'
+                formulaid: A
+          description: |
+            You may also consider using IF-MIB::ifType or IF-MIB::ifAlias for discovery depending on your filtering needs.
+            
+            {$SNMP_COMMUNITY} is a global macro.
+          item_prototypes:
+            -
+              uuid: 836960aca91d4411b5e0487dbb78f096
+              name: 'Status do administrador da interface {#SNMPVALUE}'
+              type: SNMP_AGENT
+              snmp_oid: 'IF-MIB::ifAdminStatus.{#SNMPINDEX}'
+              key: 'ifAdminStatus[{#SNMPVALUE}]'
+              delay: '60'
+              history: 7d
+              description: 'O estado desejado da interface.'
+              valuemap:
+                name: 'SNMP interface status (ifAdminStatus)'
+              tags:
+                -
+                  tag: Application
+                  value: Interfaces
+            -
+              uuid: ab80fdd5bae24c93a46bade7defe0842
+              name: 'Apelido da Interface {#SNMPVALUE}'
+              type: SNMP_AGENT
+              snmp_oid: 'IF-MIB::ifAlias.{#SNMPINDEX}'
+              key: 'ifAlias[{#SNMPVALUE}]'
+              delay: '3600'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              tags:
+                -
+                  tag: Application
+                  value: Interfaces
+            -
+              uuid: baa3c96ea67945b6a2c62a240b641d47
+              name: 'Descrição da interface $1'
+              type: SNMP_AGENT
+              snmp_oid: 'IF-MIB::ifDescr.{#SNMPINDEX}'
+              key: 'ifDescr[{#SNMPVALUE}]'
+              delay: '3600'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Uma cadeia textual contendo informações sobre a interface. Essa seqüência deve incluir o nome do fabricante, o nome do produto e a versão do hardware / software da interface.'
+              tags:
+                -
+                  tag: Application
+                  value: Interfaces
+            -
+              uuid: ca6ef572b85f470892616881684c3c0c
+              name: 'Erros de entrada na interface $1'
+              type: SNMP_AGENT
+              snmp_oid: 'IF-MIB::ifInErrors.{#SNMPINDEX}'
+              key: 'ifInErrors[{#SNMPVALUE}]'
+              delay: '60'
+              history: 7d
+              description: 'Para interfaces orientadas a pacotes, o número de pacotes de entrada que continham erros impedindo-os de serem entregues a um protocolo de camada superior. Para interfaces orientadas a caracteres ou de comprimento fixo, o número de unidades de transmissão de entrada que continham erros impedi-las de serem entregues a um protocolo de camada superior.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: Interfaces
+            -
+              uuid: a5f7bf50c34f408d96de3461013df112
+              name: 'Tráfego de entrada na interface $1'
+              type: SNMP_AGENT
+              snmp_oid: 'IF-MIB::ifInOctets.{#SNMPINDEX}'
+              key: 'ifInOctets[{#SNMPVALUE}]'
+              delay: '60'
+              history: 7d
+              units: bps
+              description: 'O número de octetos em quadros MAC válidos recebidos nesta interface, incluindo o cabeçalho MAC e FCS.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: Application
+                  value: Interfaces
+            -
+              uuid: cfbedb71df08488689c70a85778d0aa6
+              name: 'Status operacional da interface $1'
+              type: SNMP_AGENT
+              snmp_oid: 'IF-MIB::ifOperStatus.{#SNMPINDEX}'
+              key: 'ifOperStatus[{#SNMPVALUE}]'
+              delay: '60'
+              history: 7d
+              description: 'O estado operacional atual da interface.'
+              valuemap:
+                name: 'SNMP interface status (ifOperStatus)'
+              tags:
+                -
+                  tag: Application
+                  value: Interfaces
+              trigger_prototypes:
+                -
+                  uuid: 60a9caa15f434a4c95a71c8f3bf128f6
+                  expression: '(last(/1 - Template SNMP Ubiquiti AirMax Novo/ifOperStatus[{#SNMPVALUE}],#1)<>last(/1 - Template SNMP Ubiquiti AirMax Novo/ifOperStatus[{#SNMPVALUE}],#2))=1'
+                  name: 'O status operacional foi alterado {HOST.NAME} interface {#SNMPVALUE}'
+                  priority: INFO
+            -
+              uuid: 9b1ff5e7471549168362b6ec7230e22b
+              name: 'Erros de saída na interface $1'
+              type: SNMP_AGENT
+              snmp_oid: 'IF-MIB::ifOutErrors.{#SNMPINDEX}'
+              key: 'ifOutErrors[{#SNMPVALUE}]'
+              delay: '60'
+              history: 7d
+              description: 'Para interfaces orientadas a pacotes, o número de pacotes de saída que não puderam ser transmitidos por causa de erros. Para interfaces orientadas a caracteres ou de comprimento fixo, o número de unidades de transmissão de saída que não puderam ser transmitidas por causa de erros.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: Interfaces
+            -
+              uuid: 728414e0f8ea49588fc299d09b762a3c
+              name: 'Tráfego de saída na interface $1'
+              type: SNMP_AGENT
+              snmp_oid: 'IF-MIB::ifOutOctets.{#SNMPINDEX}'
+              key: 'ifOutOctets[{#SNMPVALUE}]'
+              delay: '60'
+              history: 7d
+              units: bps
+              description: 'O número de octetos em quadros MAC válidos recebidos nesta interface, incluindo o cabeçalho MAC e FCS.'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: Application
+                  value: Interfaces
+            -
+              uuid: f40d4db230ee41eaa2d166dd1a8a72ee
+              name: 'Velocidade da Interface $1'
+              type: SNMP_AGENT
+              snmp_oid: 'IF-MIB::ifSpeed.{#SNMPINDEX}'
+              key: 'ifSpeed[{#SNMPVALUE}]'
+              delay: '60'
+              history: 7d
+              valuemap:
+                name: 'SNMP interface status (ifAdminStatus)'
+              tags:
+                -
+                  tag: Application
+                  value: Interfaces
+          graph_prototypes:
+            -
+              uuid: 9024cb4fe39b4b31b6e1b60daf766283
+              name: 'Trafego da interface {#SNMPVALUE}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 00AA00
+                  item:
+                    host: '1 - Template SNMP Ubiquiti AirMax Novo'
+                    key: 'ifInOctets[{#SNMPVALUE}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 3333FF
+                  item:
+                    host: '1 - Template SNMP Ubiquiti AirMax Novo'
+                    key: 'ifOutOctets[{#SNMPVALUE}]'
+      valuemaps:
+        -
+          uuid: b6373f561a4c4791b11e115d6ffdcf52
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: 0f1c3aa56e1642df9ba78e18e7c75bbf
+          name: 'SNMP interface status (ifAdminStatus)'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '3'
+              newvalue: testing
+        -
+          uuid: 415e368de59741e69801cc8281ed93fb
+          name: 'SNMP interface status (ifOperStatus)'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '3'
+              newvalue: testing
+            -
+              value: '4'
+              newvalue: unknown
+            -
+              value: '5'
+              newvalue: dormant
+            -
+              value: '6'
+              newvalue: notPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+  triggers:
+    -
+      uuid: c3b934ccb5a54c54b997e38fcd5278b5
+      expression: 'find(/1 - Template SNMP Ubiquiti AirMax Novo/ubntChipsetVersion,,"regexp","XM")=1 and last(/1 - Template SNMP Ubiquiti AirMax Novo/ubntWlStatNoiseFloor)<-101'
+      name: 'Alto Nível de Ruido ({ITEM.LASTVALUE}) em {HOST.NAME} no IP: {HOST.CONN}'
+      status: DISABLED
+      priority: HIGH
+    -
+      uuid: 15cac8331f6148109f747acf5778d14e
+      expression: 'find(/1 - Template SNMP Ubiquiti AirMax Novo/ubntChipsetVersion,,"regexp","XM")=1 and last(/1 - Template SNMP Ubiquiti AirMax Novo/ubntWlStatNoiseFloor)>-90'
+      name: 'Alto Nível de Ruido ({ITEM.LASTVALUE}) em {HOST.NAME} no IP: {HOST.CONN}'
+      status: DISABLED
+      priority: WARNING
+      dependencies:
+        -
+          name: 'Alto Nível de Ruido ({ITEM.LASTVALUE}) em {HOST.NAME} no IP: {HOST.CONN}'
+          expression: 'find(/1 - Template SNMP Ubiquiti AirMax Novo/ubntChipsetVersion,,"regexp","XM")=1 and last(/1 - Template SNMP Ubiquiti AirMax Novo/ubntWlStatNoiseFloor)<-101'
+    -
+      uuid: 02e186fe4976478f95b75086d420d983
+      expression: 'find(/1 - Template SNMP Ubiquiti AirMax Novo/ubntChipsetVersion,,"regexp","XM")=1 and last(/1 - Template SNMP Ubiquiti AirMax Novo/ubntWlStatCcq)<90'
+      name: 'Baixo Nível de CCQ ({ITEM.LASTVALUE}) em {HOST.NAME} no IP: {HOST.CONN}'
+      status: DISABLED
+      priority: HIGH
+    -
+      uuid: 0eec452042cf432393c6f01aa96a9f2b
+      expression: 'find(/1 - Template SNMP Ubiquiti AirMax Novo/ubntChipsetVersion,,"regexp","XM")=1 and last(/1 - Template SNMP Ubiquiti AirMax Novo/ubntWlStatCcq)<95'
+      name: 'Baixo Nível de CCQ ({ITEM.LASTVALUE}) em {HOST.NAME} no IP: {HOST.CONN}'
+      status: DISABLED
+      priority: WARNING
+      dependencies:
+        -
+          name: 'Baixo Nível de CCQ ({ITEM.LASTVALUE}) em {HOST.NAME} no IP: {HOST.CONN}'
+          expression: 'find(/1 - Template SNMP Ubiquiti AirMax Novo/ubntChipsetVersion,,"regexp","XM")=1 and last(/1 - Template SNMP Ubiquiti AirMax Novo/ubntWlStatCcq)<90'
